@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, current_app
 from propelauth_flask import init_auth, current_user
 import requests
 from . import auth
+from .db import user
 
 authentication = Blueprint('authentication', __name__)
 
@@ -13,7 +14,8 @@ def home():
 def signup():
   if request.method == "POST":
     data = request.get_json()
-    email, password, metadata = data.get('email'), data.get('password'), data.get('metadata')
+    user.insert_one(data);
+    print("Account created")
   else:
     return "Pizza Studio Signup Server"
   

@@ -16,9 +16,7 @@ export default function HomeScreen() {
         body: JSON.stringify({ 
           "email": email, 
           "password": password, 
-          "metadata": {
-            "name": name 
-          }
+          "name": name
         }),
       })
 
