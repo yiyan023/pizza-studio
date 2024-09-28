@@ -1,14 +1,12 @@
 from flask import Blueprint, request, jsonify
 from bson.objectid import ObjectId
-from deepgram import Deepgram
+from deepgram import DeepgramClient, PrerecordedOptions
 from dotenv import load_dotenv
 import os
 import requests
 from .db import user_db
 
 audio_bp = Blueprint('audio', __name__)
-
-dg_client = Deepgram(os.getenv('DG_API_KEY'))
 
 @audio_bp.route('/', methods=['GET'])
 def start():
@@ -33,25 +31,30 @@ def upload_audio():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
     
+    # Read the file content
+    buffer_data = file.read()
+    payload: FileSource = {
+        "buffer": buffer_data,
+    }
     # get transcription
     options = PrerecordedOptions(
-        model="nova-2",
-        smart_format=True,
-        summarize="v2",
+        smart_format=True, model="nova-2", summarize="v2", punctuate=True, language="en-US"
     )
-    url_response = deepgram.listen.rest.v("1").transcribe_url(
-        AUDIO_URL, options
-    )
-    print(url_response)
-    # analyze text
+    dg_client = DeepgramClient(os.getenv('DG_API_KEY'))
+    response = dg_client.listen.rest.v("1").transcribe_file(payload, options)
 
+    # response = dg_client.listen.rest.v('1').transcribe_url(AUDIO_URL, options)
+    print(response.to_json(indent=4))
+    transcript = response['results']['channels'][0]['alternatives'][0]['transcript']
+    print("transcript: " + str(transcript))
+    
+    # analyze text
 
     # detect emotions
 
     # upload file to cloud
-    print("file type: " + str(type(file)))
 
-    return "Upload"
+    return jsonify({"transcript": transcript}), 200
 
 # get audio information from server
 @audio_bp.route('/audio/<id>', methods=['GET'])
