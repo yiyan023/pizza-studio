@@ -7,7 +7,6 @@ from flask_pymongo import PyMongo
 from pymongo import MongoClient
 from urllib.parse import quote_plus
 from .audio import audio_bp
-#from .db import db
 
 load_dotenv()
 
