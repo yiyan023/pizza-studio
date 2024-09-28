@@ -20,4 +20,3 @@ client = MongoClient(
     "mongodb+srv://irismo1009:zajtAWSqYIXaRGZN@technova.jbtdr.mongodb.net/?retryWrites=true&w=majority&appName=TechNova"
 )
 user_db = client.get_database("users")
-user = user_db.appdata
