@@ -1,10 +1,10 @@
-from flask import Blueprint, request, jsonify, current_app
-from propelauth_flask import init_auth, current_user
+from flask import Blueprint, request, redirect, jsonify
 import requests
 from . import auth
 from .db import user
 
 authentication = Blueprint('authentication', __name__)
+session = None
 
 @authentication.route('/')
 def home():
@@ -15,13 +15,24 @@ def signup():
   if request.method == "POST":
     data = request.get_json()
     user.insert_one(data);
-    print("Account created")
+    return jsonify({"message": "Signup successful"})
   else:
     return "Pizza Studio Signup Server"
   
 @authentication.route('/login', methods=["POST", "GET"])
 def login():
+  global session
+
+  if session:
+    print("Logged in!")
+
   if request.method == "POST":
     data = request.get_json()
     email, password = data.get('email'), data.get('password') 
-  return "Pizza Studio Login Server"
+    find_user = user.find_one({'email': email, 'password': password})
+
+    if find_user:
+      session = find_user
+      return jsonify({"message": "Signin successful"})
+    
+  return jsonify({"message": "Pizza Studio Authentication"})
