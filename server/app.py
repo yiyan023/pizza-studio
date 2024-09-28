@@ -1,7 +1,8 @@
-from flask import Flask 
+from flask_cors import CORS
 from routing import create_app
 
 app = create_app()
+CORS(app, origin=['http://localhost:8081'], methods=['POST'], allow_headers=['Content-Type'])
 
 if __name__ == '__main__':
   app.run(debug=True, port=5000)

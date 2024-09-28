@@ -5,11 +5,15 @@ import os
 
 load_dotenv()
 
-AUTH_URL = os.getenv("AUTH_URL");
+AUTH_URL = os.getenv("AUTH_URL")
 API_KEY = os.getenv("AUTH_API_KEY")
 
 def create_app():
   app = Flask(__name__)
   auth = init_auth(AUTH_URL, API_KEY)
+
+  from .auth import auth 
+
+  app.register_blueprint(auth, url_prefix="/")
 
   return app
