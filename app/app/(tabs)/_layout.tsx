@@ -2,6 +2,7 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
+import { Home, CreditCard, History, SlidersHorizontal } from '@tamagui/lucide-icons'
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -11,24 +12,42 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].red,
         headerShown: false,
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Home color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="rewards"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+          title: 'Rewards',
+          tabBarIcon: ({ color }) => (
+            <CreditCard color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          title: 'History',
+          tabBarIcon: ({ color}) => (
+            <History color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="account"
+        options={{
+          title: 'Account',
+          tabBarIcon: ({ color }) => (
+            <SlidersHorizontal color={color} />
           ),
         }}
       />
