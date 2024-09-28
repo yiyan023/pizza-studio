@@ -1,1 +1,0 @@
-TechNova 2024
