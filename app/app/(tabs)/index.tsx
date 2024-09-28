@@ -1,16 +1,20 @@
-import { View, StyleSheet, Text, TextInput, Button, Alert } from 'react-native';
+import { View, Text, TamaguiProvider, Input, Button } from 'tamagui';
+import { StyleSheet, Alert } from 'react-native';
+import config from './../../tamagui.config';
 import { useState } from 'react';
 
 export default function HomeScreen() {
   return (
-    <View>
-      <Text>Welcome to the Home page!</Text>
-    </View>
+    <TamaguiProvider config={config}>
+      <View style={styles.container}>
+        <Text fontSize={'$heading1'} fontWeight={'$bold'} color={'green'}>Hello yay!</Text>
+      </View>
+    </TamaguiProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
