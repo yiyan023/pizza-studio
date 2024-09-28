@@ -6,8 +6,8 @@ import os
 import requests
 from .db import user_db
 
+load_dotenv()
 audio_bp = Blueprint('audio', __name__)
-
 dg_client = Deepgram(os.getenv('DG_API_KEY'))
 
 @audio_bp.route('/', methods=['GET'])
