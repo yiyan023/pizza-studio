@@ -6,6 +6,16 @@ import os
 from dotenv import load_dotenv
 import certifi
 
+MONGO_URL = os.getenv("MONGO_URL")
+
+# Initialize MongoDB client and user collection
+client = MongoClient(
+   MONGO_URL,
+   tlsCaFile=certifi.where()
+)
+user_db = client.get_database("users")
+user = user_db.appdata
+
 def get_db():
     """
     Configuration method to return db instance
@@ -17,11 +27,4 @@ def get_db():
 
 # Use LocalProxy to read the global db instance with just `db`
 db = LocalProxy(get_db)
-MONGO_URL = os.getenv("MONGO_URL")
 
-# Initialize MongoDB client and user collection
-client = MongoClient(
-   MONGO_URL,
-   tlsCaFile=certifi.where()
-)
-user_db = client.get_database("users")

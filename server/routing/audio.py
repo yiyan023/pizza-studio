@@ -1,10 +1,14 @@
 from flask import Blueprint, request, jsonify
 from bson.objectid import ObjectId
+from deepgram import Deepgram
+from dotenv import load_dotenv
 import os
 import requests
 from .db import user_db
 
 audio_bp = Blueprint('audio', __name__)
+
+dg_client = Deepgram(os.getenv('DG_API_KEY'))
 
 @audio_bp.route('/', methods=['GET'])
 def start():
@@ -30,6 +34,8 @@ def upload_audio():
         return jsonify({"error": "No selected file"}), 400
     
     # upload file 
+    print("file type: " + str(type(file)))
+
     return "Upload"
 
 # get audio information from server
