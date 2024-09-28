@@ -33,7 +33,22 @@ def upload_audio():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
     
-    # upload file 
+    # get transcription
+    options = PrerecordedOptions(
+        model="nova-2",
+        smart_format=True,
+        summarize="v2",
+    )
+    url_response = deepgram.listen.rest.v("1").transcribe_url(
+        AUDIO_URL, options
+    )
+    print(url_response)
+    # analyze text
+
+
+    # detect emotions
+
+    # upload file to cloud
     print("file type: " + str(type(file)))
 
     return "Upload"
