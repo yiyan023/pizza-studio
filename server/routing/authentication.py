@@ -14,6 +14,12 @@ def home():
 def signup():
   if request.method == "POST":
     data = request.get_json()
+    existing_email = user.find_one({"email": data.get('email')})
+
+    if existing_email:
+      print("Email exists")
+      return jsonify({"message": "Email exists"})
+
     user.insert_one(data);
     return jsonify({"message": "Signup successful"})
   else:
@@ -23,16 +29,13 @@ def signup():
 def login():
   global session
 
-  if session:
-    print("Logged in!")
-
   if request.method == "POST":
     data = request.get_json()
     email, password = data.get('email'), data.get('password') 
     find_user = user.find_one({'email': email, 'password': password})
 
     if find_user:
-      session = find_user
-      return jsonify({"message": "Signin successful"})
+      session = email
+      return jsonify({"message": "Signin successful", "user": session})
     
   return jsonify({"message": "Pizza Studio Authentication"})
