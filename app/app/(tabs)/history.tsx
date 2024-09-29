@@ -6,6 +6,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { Text, ScrollView, YStack } from 'tamagui';
 import { useEffect, useState } from 'react';
 import Logo from "../../assets/images/Logo";
+import { useSession } from '../context';
 
 interface Analysis {
   "Danger likeliness": string;
@@ -26,48 +27,11 @@ interface AccordionItemProps {
 }
 
 export default function TabTwoScreen() {
-  // const exampleDate = "Sample Date";
-  // const exampleTime = "Sample Time";
-  // const exampleAudio = require('./audio_test_1.mp3');
-  // const exampleTranscript = "This is the transcript of the audio.";
-  // const audioInfo = [
-  //   {
-  //     id: "",
-  //     date: "September 20, 2023",
-  //     time: "1:32 PM",
-  //     audio: 'https://pizzastudios.s3.amazonaws.com/audio_test_1.mp3',
-  //     //audio: require('./audio_test_1.mp3'),
-  //     transcript: "Testing testing testing hello",
-  //     analysis: {
-  //       "Danger likeliness": "Very unlikely",
-  //       "Danger level": "Low",
-  //       "Key words": "None",
-  //       "Person type": "None",
-  //       "Abuse type": "None"
-  //     },
-  //     emotions: ["Anger", "Distress", "Amusement", "Fear", "Horror", "Pain", "Calmness", "Determination"]
-  //   }, 
-  //   {
-  //     id: "",
-  //     date: "September 19, 2023",
-  //     time: "10:25 AM",
-  //     audio: 'https://pizzastudios.s3.amazonaws.com/audio_test_1.mp3',
-  //     transcript: "OMG SAUR SLAY",
-  //     analysis: {
-  //       "Danger likeliness": "Very unlikely",
-  //       "Danger level": "Low",
-  //       "Key words": "None",
-  //       "Person type": "None",
-  //       "Abuse type": "None"
-  //     },
-  //     emotions: []
-  //   }
-  // ]
-
   const SERVER_ADDRESS = "192.168.0.32"
   const [audioInfo, setAudioInfo] = useState([]);
   const [loading, setLoading] = useState(true);
-  const userEmail = 'bob@gmail.com'; // Replace with the actual user email
+  const { session } = useSession();
+  const userEmail = session?.email;
 
   useEffect(() => {
     const fetchAudioData = async () => {
