@@ -36,19 +36,16 @@ export default function TabTwoScreen() {
   const userEmail = session?.email;
 
   useEffect(() => {
-    const fetchAudioData = async () => {
-      try {
-        const response = await fetch(`http://${SERVER_ADDRESS}:5000/audio/user/${userEmail}`);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        console.log(Object.keys(data))
-        setAudioInfo(data);
-      } catch (error) {
-        console.error('Error fetching audio data:', error);
-      } finally {
-        setLoading(false);
+    console.log(audioInfo);
+  }, [
+    audioInfo
+  ])
+
+  const fetchAudioData = async () => {
+    try {
+      const response = await fetch(`http://${SERVER_ADDRESS}:5000/audio/user/${userEmail}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
       const data = await response.json();
       setAudioInfo(data);
@@ -74,7 +71,7 @@ export default function TabTwoScreen() {
     );
   }
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', options);
