@@ -43,6 +43,12 @@ def upload_processed_audio():
     
     if file:
         try:
+            # Log file size
+            file.seek(0, 2)  # Move to the end of the file
+            file_size = file.tell()
+            file.seek(0)  # Move back to the start of the file
+            print(f"Received file size: {file_size} bytes")
+
             # get transcript
             transcript = get_transcript(file)
             # transcript = "I'm sooo excited to go to the movies with you yay!!!"
@@ -62,7 +68,8 @@ def upload_processed_audio():
             # emotion_results = ["Disappointment", "Awkwardness"]
 
             # save audio to s3
-            s3_url = upload_to_s3(file, os.getenv('AWS_S3_BUCKET_NAME'))
+            file.seek(0)
+            s3_url = upload_to_s3(file)
             if not s3_url:
                 return jsonify({"error": "Failed to upload to S3"}), 500
 
@@ -406,9 +413,8 @@ def get_audio_emotions_url(url):
         print(f"Error processing audio emotions: {e}")
         return []
 
-def upload_to_s3(file, object_name=None):
-    if object_name is None:
-        object_name = file.filename
+def upload_to_s3(file):
+    object_name = file.filename
     try:
         s3.upload_fileobj(file, BUCKET_NAME, object_name)
         # s3.upload_fileobj(file, BUCKET_NAME, object_name, ExtraArgs={'ACL': 'public-read'})
