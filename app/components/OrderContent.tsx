@@ -180,7 +180,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ date, time, audioSource, 
                     {emotions.map((emotion, index) => {
                         return (
                         <>
-                            <Text style={{ color: highlightedEmotions.includes(emotion) ? Colors.light.red : 'normal' }}>
+                            <Text key={index} style={{ color: highlightedEmotions.includes(emotion) ? Colors.light.red : 'normal' }}>
                             {emotion}
                             </Text>
                             <Text>{index < emotions.length - 1 && ", "} </Text>
