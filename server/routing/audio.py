@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from bson.objectid import ObjectId
 from deepgram import DeepgramClient, PrerecordedOptions
 from dotenv import load_dotenv
+from openai import OpenAI
 import os
 import requests
 from .db import user_db
@@ -32,30 +33,46 @@ def upload_audio():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
     
-    # Read the file content
-    buffer_data = file.read()
-    payload: FileSource = {
-        "buffer": buffer_data,
-    }
-    # get transcription
-    options = PrerecordedOptions(
-        smart_format=True, model="nova-2", summarize="v2", punctuate=True, language="en-US"
-    )
-    dg_client = DeepgramClient(os.getenv('DG_API_KEY'))
-    response = dg_client.listen.rest.v("1").transcribe_file(payload, options)
+    # Read the file content + get transcription
+    # buffer_data = file.read()
+    # payload: FileSource = {
+    #     "buffer": buffer_data,
+    # }
+    # options = PrerecordedOptions(
+    #     smart_format=True, model="nova-2", summarize="v2", punctuate=True, language="en-US"
+    # )
+    # dg_client = DeepgramClient(os.getenv('DG_API_KEY'))
+    # response = dg_client.listen.rest.v("1").transcribe_file(payload, options)
 
-    # response = dg_client.listen.rest.v('1').transcribe_url(AUDIO_URL, options)
-    print(response.to_json(indent=4))
-    transcript = response['results']['channels'][0]['alternatives'][0]['transcript']
-    print("transcript: " + str(transcript))
+    # print(response.to_json(indent=4))
+    # transcript = response['results']['channels'][0]['alternatives'][0]['transcript']
+    # print("transcript: " + str(transcript))
+    transcript = "I'm sooo excited to go to the movies with you yay!!!"
     
     # analyze text
+    # client = OpenAI(api_key=os.getenv('OPENAI_KEY'))
+
+    # response = client.chat.completions.create(
+    #     model="gpt-4o-mini",
+    #     messages=[
+    #         {"role": "system", 
+    #          "content": "You will be given conversation transcripts. Analyze it to determine if there are signs that someone in the conversation is a victim or perpetrator of domestic abuse, sexual harassment, or general harassment. Format the response strictly as followed: 1. Analysis: [Word indicating likeliness of danger here from very likely to very unlikely], [Word indicating level of danger here from very high to low], 2. Key words: [list specific language or behavior that suggests abuse, harassment, or danger directly from transcript separated by comments] 3. Type: [Victim or perpetrator], [Type of abuse or harassment here]"},
+    #         {
+    #             "role": "user",
+    #             "content": transcript
+    #         }
+    #     ]
+    # )
+    # analysis = response.choices[0].message.content
+    # print("analysis: " + str(analysis))
+    analysis = "1. Analysis: Very unlikely, Low  \n2. Key words: none  \n3. Type: None, None"
 
     # detect emotions
 
+
     # upload file to cloud
 
-    return jsonify({"transcript": transcript}), 200
+    return jsonify({"transcript": transcript, "analysis": analysis}), 200
 
 # get audio information from server
 @audio_bp.route('/audio/<id>', methods=['GET'])
