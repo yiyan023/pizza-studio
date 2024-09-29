@@ -7,6 +7,8 @@ import { Text, ScrollView, YStack } from 'tamagui';
 import { useEffect, useState } from 'react';
 import Logo from "../../assets/images/Logo";
 import { useSession } from '../context';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 interface Analysis {
   "Danger likeliness": string;
@@ -33,24 +35,26 @@ export default function TabTwoScreen() {
   const { session } = useSession();
   const userEmail = session?.email;
 
-  useEffect(() => {
-    const fetchAudioData = async () => {
-      try {
-        const response = await fetch(`http://${SERVER_ADDRESS}:5000/audio/user/${userEmail}`);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setAudioInfo(data);
-      } catch (error) {
-        console.error('Error fetching audio data:', error);
-      } finally {
-        setLoading(false);
+  const fetchAudioData = async () => {
+    try {
+      const response = await fetch(`http://${SERVER_ADDRESS}:5000/audio/user/${userEmail}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    };
+      const data = await response.json();
+      setAudioInfo(data);
+    } catch (error) {
+      console.error('Error fetching audio data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchAudioData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchAudioData();
+    }, [])
+  );
 
   if (loading) {
     return (
