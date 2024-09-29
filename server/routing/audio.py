@@ -37,7 +37,7 @@ def upload_processed_audio():
     
     email = request.form.get('email')
     password = request.form.get('password')
-    today = datetime.now();
+    today = datetime.now()
     date_string = today.strftime('%Y-%m-%d %H:%M:%S')
 
     if not email or not password:
@@ -92,16 +92,18 @@ def upload_processed_audio():
             result = audio_collection.insert_one(audio_data)
 
             if (analysis['Danger likeliness'] in ["Very Likely", "Likely"] or analysis['Danger level'] in ["Very High", "High"]):
-                account_sid = '[AccountSid]'
-                auth_token = '[AuthToken]' 
+                account_sid = os.getenv('TWILIO_SID') 
+                auth_token = os.getenv('TWILIO_TOKEN')  
                 client = Client(account_sid, auth_token)
 
                 # Create a message body that combines the analysis and the S3 link
                 message_body = (
-                    f"Alert! Danger Analysis: {analysis['Danger likeliness']}, "
-                    f"Level: {analysis['Danger level']}. "
-                    f"Transcript: {transcript}. "
-                    f"Listen to the audio here: {s3_url}"
+                    f"Alert! friend in danger\n"
+                    f"Danger Analysis: {analysis['Danger likeliness']},\n"
+                    f"Level: {analysis['Danger level']}.\n"
+                    f"Transcript: {transcript}.\n"
+                    f"Listen to the audio here: {s3_url}\n"
+                    f"from: {email}"
                 )
 
                 try:
