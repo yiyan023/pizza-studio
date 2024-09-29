@@ -2,7 +2,7 @@ import {useState} from 'react';
 import { StyleSheet, TextInput, View, TouchableOpacity} from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { ThemedView } from '@/components/ThemedView';
-import { Text, XStack, YStack, Button} from "tamagui";
+import { Text, XStack, YStack, Button, ScrollView} from "tamagui";
 import { Edit3, Plus } from '@tamagui/lucide-icons'
 import Profile from "./../../assets/images/Profile"
 import Comrade from "./../../assets/images/Comrade"
@@ -113,11 +113,16 @@ export default function Screen() {
       </View>
 
       <View style={styles.horizontalLine} />
-
-      <ThemedView style={styles.titleContainer}>
-        <Text color={Colors.light.black} fontSize={'$heading1'} fontWeight={'$bold'}>Contact Us!</Text>
-        <Text color={Colors.light.black} fontSize={'$main'} fontWeight={'$bold'}>Assaulted Women's Helpline: <Text color={Colors.light.green} fontSize={'$main'}>111-222-3333</Text></Text>
-      </ThemedView>
+      <ScrollView>
+        <ThemedView style={styles.titleContainer}>
+          <Text color={Colors.light.black} fontSize={'$heading1'} fontWeight={'$bold'}>Contact Us!</Text>
+          <Text color={Colors.light.black} fontSize={'$main'} fontWeight={'$bold'}>Assaulted Women's Helpline: <Text color={Colors.light.green} fontSize={'$main'}>866-863-0511</Text></Text>
+          <Text color={Colors.light.black} fontSize={'$main'} fontWeight={'$bold'}>Emergency Shelter First Connect: <Text color={Colors.light.green} fontSize={'$main'}>519-624-9133</Text></Text>
+          <Text color={Colors.light.black} fontSize={'$main'} fontWeight={'$bold'}>Salal Sexual Violence Support Centre: <Text color={Colors.light.green} fontSize={'$main'}>604-255-6344</Text></Text>
+          <Text color={Colors.light.black} fontSize={'$main'} fontWeight={'$bold'}>Family Violence Project of Waterloo Region: <Text color={Colors.light.green} fontSize={'$main'}>519-743-6333</Text></Text>
+          <Text color={Colors.light.black} fontSize={'$main'} fontWeight={'$bold'}>Kids Help Phone: <Text color={Colors.light.green} fontSize={'$main'}>800-668-6868</Text></Text>
+        </ThemedView>
+      </ScrollView>
     </>
   );
 }
