@@ -47,12 +47,6 @@ def upload_processed_audio():
     
     if file:
         try:
-            # Log file size
-            file.seek(0, 2)  # Move to the end of the file
-            file_size = file.tell()
-            file.seek(0)  # Move back to the start of the file
-            print(f"Received file size: {file_size} bytes")
-
             # get transcript
             transcript = get_transcript(file)
             # transcript = "I'm sooo excited to go to the movies with you yay!!!"
@@ -70,6 +64,12 @@ def upload_processed_audio():
             # detect emotions (array)
             emotion_results = get_audio_emotions_file(file)
             # emotion_results = ["Disappointment", "Awkwardness"]
+
+            # Log file size
+            file.seek(0, 2)  # Move to the end of the file
+            file_size = file.tell()
+            file.seek(0)  # Move back to the start of the file
+            print(f"Received file size: {file_size} bytes")
 
             # save audio to s3
             file.seek(0)
@@ -120,7 +120,7 @@ def upload_audio():
     if file:
         try:
             # save audio to s3
-            s3_url = upload_to_s3(file, os.getenv('AWS_S3_BUCKET_NAME'))
+            s3_url = upload_to_s3(file)
             if not s3_url:
                 return jsonify({"error": "Failed to upload to S3"}), 500
 
@@ -236,6 +236,7 @@ def get_user_audio(user_email):
                 "transcript": audio_data.get("transcript"),
                 "analysis": audio_data.get("analysis"),
                 "emotions": audio_data.get("emotions"),
+                "date": audio_data.get("date"),
                 "s3_url": presigned_url
             })
 

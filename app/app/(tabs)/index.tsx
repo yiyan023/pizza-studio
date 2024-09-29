@@ -131,6 +131,10 @@ export default function LoadScreen() {
 
   const compressAndSendAudio = async (uri: string) => {
     try {
+      console.log(`File URI: ${uri}`);
+      const fileInfo = await FileSystem.getInfoAsync(uri);
+      console.log(`File size: ${fileInfo.size} bytes`);
+      
       // Read the file content
       const random_name = generateRandomString(10);
       const today = new Date();
