@@ -133,6 +133,7 @@ export default function LoadScreen() {
     try {
       // Read the file content
       const random_name = generateRandomString(10);
+      const today = new Date();
 
       const formData = new FormData();
       formData.append('file', {
@@ -147,6 +148,10 @@ export default function LoadScreen() {
       
       if (session?.password) {
         formData.append('password', session?.password);
+      }
+
+      if (today) {
+        formData.append('date', today.toISOString())
       }
 
       const response = await fetch(`http://${SERVER_ADDRESS}/uploadProcessedAudio`, {
