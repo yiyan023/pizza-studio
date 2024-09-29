@@ -64,8 +64,8 @@ export default function LoadScreen() {
   }, [session]);  
 
   useEffect(() => {
-    console.log(session)
-  }, [session])
+    console.log(loading)
+  }, [loading])
 
   const handlePizzaClick = () => {
     setIsPizzaClicked(!isPizzaClicked); // Toggle between active and default pizza data
@@ -75,7 +75,7 @@ export default function LoadScreen() {
 
   return (
     <>
-      {!loading ? (
+      {loading ? (
         <View style={styles.loadingContainer}>
           <Logo height={80}></Logo>
           <Text color={Colors.light.white}>Loading...</Text>
