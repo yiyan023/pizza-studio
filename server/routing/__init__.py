@@ -6,7 +6,7 @@ import os
 from flask_pymongo import PyMongo
 from pymongo import MongoClient
 from urllib.parse import quote_plus
-from .audio import audio_bp
+from .audio import audio
 
 load_dotenv()
 
@@ -27,6 +27,6 @@ def create_app():
   app.config['AUTH_API_KEY'] = API_KEY
 
   # blueprints
-  app.register_blueprint(audio_bp)
+  app.register_blueprint(audio)
 
   return app
