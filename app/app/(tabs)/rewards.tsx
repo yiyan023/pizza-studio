@@ -129,10 +129,13 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         position: 'absolute',
-        bottom: 20,
-        left: '50%',
-        transform: [{ translateX: -150 }],
+        bottom: '9%',
+        alignSelf: 'center', // Center the button container horizontally
         alignItems: 'center',
+        left: '12%',
+        //left: '50%',
+        //transform: [{ translateX: -150 }],
+        //alignItems: 'center',
     },
     buttonMargin: {
         marginTop: 15,

@@ -77,7 +77,7 @@ export default function SignIn() {
       // justifyContent='center'
       flex={1}
       >
-        <Header/>
+        <Header address=''/>
         <Image 
           source={require('../../assets/images/signin-pizza.png')}
           style={{ width: 390, height: 200, borderRadius: 0 }} // Add styling here
@@ -137,9 +137,9 @@ export default function SignIn() {
         </YStack>
         <ButtonA 
           buttonType="fill"
-          title={loading ? 'loading' : 'submit'} 
-          color={Colors.light.red} 
-          onPress={handleLogin}/>
+          //title={loading ? 'loading' : 'submit'} 
+          //color={Colors.light.red} 
+          onPress={handleLogin}>{loading ? 'Loading' : 'Submit'} </ButtonA>
         <Text 
           fontSize={"$normal"} 
           color={Colors.light.black}>

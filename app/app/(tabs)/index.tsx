@@ -32,7 +32,7 @@ export default function LoadScreen() {
       ) : (
         <Text>Welcome!</Text>
       )}
-      <ButtonA buttonType="text"> x </ButtonA>
+      <ButtonA buttonType='fill' width={40} backgroundColor={Colors.light.green}>hi</ButtonA>
     </View>
   );
 }
