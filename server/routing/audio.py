@@ -9,6 +9,7 @@ import tempfile
 import os
 import requests
 from .db import user_db, user, s3
+from datetime import datetime
 
 load_dotenv()
 audio = Blueprint('audio', __name__)
@@ -35,6 +36,9 @@ def upload_processed_audio():
     
     email = request.form.get('email')
     password = request.form.get('password')
+    today = datetime.now();
+    date_string = today.strftime('%Y-%m-%d %H:%M:%S')
+
     if not email or not password:
         return jsonify({"error": "Email and password are required"}), 400
     user_entry = user.find_one({"email": email})
@@ -80,11 +84,13 @@ def upload_processed_audio():
                 "transcript": transcript,
                 "analysis": analysis,
                 "emotions": emotion_results,
-                "s3_url": s3_url
+                "s3_url": s3_url,
+                "date": date_string
             }
+
             result = audio_collection.insert_one(audio_data)
 
-            return jsonify({"transcript": transcript, "analysis": analysis, "emotions": emotion_results, "s3_url": s3_url, "id": str(result.inserted_id)}), 200
+            return jsonify({"transcript": transcript, "analysis": analysis, "emotions": emotion_results, "s3_url": s3_url, "id": str(result.inserted_id), "date": date_string}), 200
         except Exception as e:
             return jsonify({'error': str(e)}), 500
 
