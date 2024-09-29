@@ -16,9 +16,9 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
 
   const handleSignup = async () => {
-    setLoading(true); // Start loading as soon as the function is called
+    setLoading(true); 
     const validEmail = validator.isEmail(email);
-    let hasError = false; // Track if there are validation errors
+    let hasError = false; 
   
     if (!validEmail || email === '') {
       console.log("email is empty");
