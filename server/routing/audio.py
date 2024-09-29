@@ -219,6 +219,7 @@ def get_user_audio(user_email):
                 ExpiresIn=3600  # URL expires in 1 hour
             )
             response_data.append({
+                "id": str(audio_data.get("_id")),
                 "transcript": audio_data.get("transcript"),
                 "analysis": audio_data.get("analysis"),
                 "emotions": audio_data.get("emotions"),

@@ -4,7 +4,7 @@ import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 import * as Permissions from 'expo-permissions';
 
-const SERVER_ADDRESS = "192.168.0.32:5000"
+const SERVER_ADDRESS = "192.168.0.32"
 
 export default function RecordAudio() {
   const [soundLevel, setSoundLevel] = useState<number[]>([]);
@@ -87,7 +87,7 @@ export default function RecordAudio() {
       formData.append('email', 'bob123@gmail.com');
       formData.append('password', 'bob');
 
-      const response = await fetch(`http://${SERVER_ADDRESS}/uploadProcessedAudio`, {
+      const response = await fetch(`http://${SERVER_ADDRESS}:5000/uploadProcessedAudio`, {
         method: 'POST',
         body: formData,
         headers: {

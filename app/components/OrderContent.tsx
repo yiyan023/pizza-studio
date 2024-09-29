@@ -18,14 +18,14 @@ interface Analysis {
 interface AccordionItemProps {
   date: string;
   time: string;
-  audioSource: string; // Adjust based on your audio source
+  s3_url: string; // Adjust based on your audio source
   transcript: string;
   analysis: Analysis;
   emotions: Array<string>;
   signifierColor?: string;
 }
 
-const AccordionItem: React.FC<AccordionItemProps> = ({ date, time, audioSource, transcript, analysis, emotions, signifierColor = Colors.light.grey3 }) => {
+const AccordionItem: React.FC<AccordionItemProps> = ({ date, time, s3_url, transcript, analysis, emotions, signifierColor = Colors.light.grey3 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isTranscriptOpen, setIsTranscriptOpen] = useState(false);
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
@@ -49,11 +49,11 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ date, time, audioSource, 
   const togglePlayPause = async () => {
     if (!sound) {
       const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: audioSource }, // Directly use the URL for playback
+        { uri: s3_url }, // Directly use the URL for playback
         {},
         onPlaybackStatusUpdate
       );
-      // const { sound: newSound } = await Audio.Sound.createAsync(audioSource, {}, onPlaybackStatusUpdate);
+      // const { sound: newSound } = await Audio.Sound.createAsync(s3_url, {}, onPlaybackStatusUpdate);
       setSound(newSound);
       await newSound.playAsync();
     } else {
