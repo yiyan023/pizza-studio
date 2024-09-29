@@ -3,41 +3,55 @@ import { TouchableOpacity, StyleSheet } from 'react-native';
 import {Text} from "tamagui";
 import { Colors } from '@/constants/Colors'; // Assuming you still want to use your color constants
 
-type ButtonType = "outline" | "fill";
+type ButtonType = "outline" | "fill" | "text";
 
 const backgroundColorMapping: Record<ButtonType, string> = {
     outline: Colors.light.white,
     fill: Colors.light.red,
+    text: 'transparent'
 };
 
 const hoverBackgroundColorMapping: Record<ButtonType, string> = {
     outline: Colors.light.grey2,
     fill: Colors.light.darkRed,
+    text: 'transparent'
 };
 
 const textColorMapping: Record<ButtonType, string> = {
     outline: Colors.light.red,
     fill: Colors.light.white,
+    text: Colors.light.red
+};
+
+const hoverTextColorMapping: Record<ButtonType, string> = {
+    outline: Colors.light.darkRed,
+    fill: Colors.light.grey2,
+    text: Colors.light.darkRed,
 };
 
 const borderMapping: Record<ButtonType, number> = {
     outline: 3,
     fill: 0,
+    text: 0
 };
 
 interface ButtonAProps {
     buttonType: ButtonType;
     children: React.ReactNode;
+    textColor?: string;
 }
 
-const ButtonA: React.FC<ButtonAProps> = ({ buttonType, children, ...props }) => {
+const ButtonA: React.FC<ButtonAProps> = ({ buttonType, children, textColor, ...props }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     const backgroundColor = isHovered 
         ? hoverBackgroundColorMapping[buttonType] 
         : backgroundColorMapping[buttonType];
 
-    const textColor = textColorMapping[buttonType];
+    const defaultTextColor = isHovered 
+    ? hoverTextColorMapping[buttonType] 
+    : textColorMapping[buttonType];
+
     const borderWidth = borderMapping[buttonType];
 
     return (
@@ -54,7 +68,7 @@ const ButtonA: React.FC<ButtonAProps> = ({ buttonType, children, ...props }) => 
             onPressOut={() => setIsHovered(false)}
             {...props}
         >
-            <Text color={textColor} fontWeight={'$bold'}>{children}</Text>
+            <Text  color= {textColor || defaultTextColor} fontWeight={'$bold'}>{children}</Text>
         </TouchableOpacity>
     );
 };

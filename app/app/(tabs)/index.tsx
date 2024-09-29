@@ -32,7 +32,7 @@ export default function LoadScreen() {
       ) : (
         <Text>Welcome!</Text>
       )}
-      <ButtonA buttonType="outline"> hi </ButtonA>
+      <ButtonA buttonType="text"> x </ButtonA>
     </View>
   );
 }
