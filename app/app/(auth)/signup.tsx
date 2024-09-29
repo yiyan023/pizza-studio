@@ -9,6 +9,8 @@ import Header from '../../components/Header';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { l } from 'vite/dist/node/types.d-aGj9QkWt';
 
+const SERVER_ADDRESS="192.168.0.32"
+
 export default function SignUp() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -53,7 +55,7 @@ export default function SignUp() {
     }
   
     try {
-      const response = await fetch('http://127.0.0.1:5000/sign-up', {
+      const response = await fetch(`http://${SERVER_ADDRESS}:5000/sign-up`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -87,7 +89,6 @@ export default function SignUp() {
 
   return (
       <YStack gap={0}>
-        <Header/>
         <Image 
           source={require('../../assets/images/signin-pizza.png')}
           style={{ width: 390, height: 200, borderRadius: 0 }} // Add styling here
@@ -112,6 +113,7 @@ export default function SignUp() {
           borderRadius={50}
           backgroundColor={Colors.light.white}
           borderColor={Colors.light.grey2}
+          color={Colors.light.black}
         />
         {noName && 
           <Text
@@ -135,6 +137,7 @@ export default function SignUp() {
           borderRadius={50}
           backgroundColor={Colors.light.white}
           borderColor={Colors.light.grey2}
+          color={Colors.light.black}
         />
         {badEmail && 
           <Text
@@ -164,6 +167,7 @@ export default function SignUp() {
           borderRadius={50}
           backgroundColor={Colors.light.white}
           borderColor={Colors.light.grey2}
+          color={Colors.light.black}
         />
         {badPassword && 
           <Text

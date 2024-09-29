@@ -2,8 +2,8 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 // Define the shape of your session data
 interface Session {
-    name?: string;
     email?: string;
+    password?: string;
     // Add any other properties you expect in the session
 }
 

@@ -3,18 +3,18 @@ import { useEffect, useState } from 'react';
 import { useSession } from '../context';
 import { router } from 'expo-router';
 
-import {Text} from "tamagui";
+import { Text } from "tamagui";
 import { Colors } from '@/constants/Colors';
-import  ButtonA  from './../../components/ButtonA'
+import ButtonA from './../../components/ButtonA'
 
 export default function LoadScreen() {
   const { session } = useSession();
   const [loading, setLoading] = useState(true);
 
-  /* useEffect(() => {
+  useEffect(() => {
     const timeout = setTimeout(() => {
       if (!session) {
-        router.navigate('/signin'); 
+        router.navigate('/signin');
       }
     }, 2000);
 
@@ -23,7 +23,11 @@ export default function LoadScreen() {
     }
 
     return () => clearTimeout(timeout);
-  }, [session]); */
+  }, [session]);  
+
+  useEffect(() => {
+    console.log(session)
+  }, [session])
 
   return (
     <View style={styles.container}>
