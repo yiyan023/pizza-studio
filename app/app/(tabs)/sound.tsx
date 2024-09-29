@@ -1,24 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import * as Permissions from 'expo-permissions';
 import { Audio } from 'expo-av';
 
 export default function SoundLevelMeter() {
   const [soundLevel, setSoundLevel] = useState<number[]>([]);
   const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [mediaStream, setMediaStream] = useState<Audio.Recording | null>(null);
+  const mediaRef = useRef<Audio.Recording | null>(null); // Use a ref for media
   const [finished, setFinished] = useState(false);
+  let intervalId: NodeJS.Timeout | null = null;
 
-  const stopRecording = async () => {
-    if (mediaStream) {
-      await mediaStream.stopAndUnloadAsync(); 
-      console.log("Recording stopped");
-      setMediaStream(null);
-    }
-    
+  async function stopRecording() {
     setIsRecording(false);
+    if (mediaRef.current) {
+      await mediaRef.current.stopAndUnloadAsync().then(() => {
+        if (intervalId) {
+          clearInterval(intervalId);
+        }
+      });
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+      });
+    }
+
     setFinished(true);
-  };
+  }
 
   const startRecording = async () => {
     const { status } = await Audio.requestPermissionsAsync();
@@ -33,19 +38,17 @@ export default function SoundLevelMeter() {
       );
 
       const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
-      setMediaStream(recording);
-      console.log("Recording...")
-
+      mediaRef.current = recording; // Set the ref instead of state
       recordAudioSamples(recording);
     } else {
       console.error("Microphone permission not granted.");
+      setIsRecording(false);
       return null;
     }
   }
 
   const recordAudioSamples = async (recording: Audio.Recording) => {
-    // Set an interval to calculate decibels
-    const intervalId = setInterval(async () => {
+    intervalId = setInterval(async () => {
       const status = await recording.getStatusAsync();
       if (status.isRecording) {
         const db: number | undefined = status.metering;
@@ -53,16 +56,7 @@ export default function SoundLevelMeter() {
           setSoundLevel(prevSoundLevel => [...prevSoundLevel, db + 100]);
         }
       }
-    }, 1000); // Adjust the interval as needed
-
-    // Clear the interval when recording is stopped
-    return () => clearInterval(intervalId);
-  };
-
-  const calculateRMS = (data) => {
-    const sumOfSquares = data.reduce((acc, value) => acc + value * value, 0);
-    const mean = sumOfSquares / data.length;
-    return Math.sqrt(mean);
+    }, 500);
   };
 
   useEffect(() => {
@@ -71,8 +65,6 @@ export default function SoundLevelMeter() {
         stopRecording();
       }, 5000);
     }
-
-    console.log(soundLevel)
   }, [isRecording])
   
   return (
