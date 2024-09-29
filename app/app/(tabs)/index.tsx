@@ -1,7 +1,10 @@
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useEffect, useState } from 'react';
 import { useSession } from '../context';
 import { router } from 'expo-router';
+
+import {Text} from "tamagui";
+import { Colors } from '@/constants/Colors';
 
 export default function LoadScreen() {
   const { session } = useSession();
@@ -24,7 +27,7 @@ export default function LoadScreen() {
   return (
     <View style={styles.container}>
       {loading ? (
-        <Text>Pizza Studio</Text>
+        <Text color={Colors.light.grey4}>Pizza Studio</Text>
       ) : (
         <Text>Welcome!</Text>
       )}

@@ -18,8 +18,11 @@ export const Colors = {
     green: '#425E25',
     peach: '#F1E3C9',
     yellow: '#E8C032',
-    grey1: '#ACACAC',
-    grey2: '#7d7d7d'
+    grey1: "#E9E9E9",
+    grey2: '#D9D9D9',
+    grey3: '#ACACAC',
+    grey4: '#7d7d7d'
+
   },
   dark: {
     text: '#ECEDEE',
