@@ -10,6 +10,7 @@ import os
 import requests
 from .db import user_db, user, s3
 from datetime import datetime
+from twilio.rest import Client
 
 load_dotenv()
 audio = Blueprint('audio', __name__)
@@ -89,6 +90,29 @@ def upload_processed_audio():
             }
 
             result = audio_collection.insert_one(audio_data)
+
+            if (analysis['Danger likeliness'] in ["Very Likely", "Likely"] or analysis['Danger level'] in ["Very High", "High"]):
+                account_sid = '[AccountSid]'
+                auth_token = '[AuthToken]' 
+                client = Client(account_sid, auth_token)
+
+                # Create a message body that combines the analysis and the S3 link
+                message_body = (
+                    f"Alert! Danger Analysis: {analysis['Danger likeliness']}, "
+                    f"Level: {analysis['Danger level']}. "
+                    f"Transcript: {transcript}. "
+                    f"Listen to the audio here: {s3_url}"
+                )
+
+                try:
+                    message = client.messages.create(
+                        from_='+12762121094',
+                        body=message_body,
+                        to='+14372362361'
+                    )
+                    print(f"Message sent with SID: {message.sid}")
+                except Exception as e:
+                    print(f"Failed to send message: {str(e)}")
 
             return jsonify({"transcript": transcript, "analysis": analysis, "emotions": emotion_results, "s3_url": s3_url, "id": str(result.inserted_id), "date": date_string}), 200
         except Exception as e:
