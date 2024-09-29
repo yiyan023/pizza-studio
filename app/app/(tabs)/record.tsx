@@ -2,6 +2,9 @@ import React, { useState, useRef } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
+import * as Permissions from 'expo-permissions';
+
+const SERVER_ADDRESS = "192.168.0.32:5000"
 
 export default function RecordAudio() {
   const [soundLevel, setSoundLevel] = useState<number[]>([]);
@@ -17,15 +20,22 @@ export default function RecordAudio() {
         if (mediaRef.current) {
           const uri = mediaRef.current.getURI();
           const sound = new Audio.Sound();
-
-          try {
-              if (uri) {
-                await sound.loadAsync({uri: uri })
-                await sound.playAsync();
-              }
-          } catch (error) {
-            console.log(error)
+          if (uri) {
+            try {
+              // Compress and send the audio file
+              await compressAndSendAudio(uri);
+            } catch (error) {
+              console.log(error);
+            }
           }
+          // try {
+          //     if (uri) {
+          //       await sound.loadAsync({uri: uri })
+          //       await sound.playAsync();
+          //     }
+          // } catch (error) {
+          //   console.log(error)
+          // }
         }
         if (intervalId) {
           clearInterval(intervalId);
@@ -57,6 +67,38 @@ export default function RecordAudio() {
       console.error("Microphone permission not granted.");
       setIsRecording(false);
       return null;
+    }
+  }
+
+  const compressAndSendAudio = async (uri: string) => {
+    try {
+      // Read the file content
+      const fileContent = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      const formData = new FormData();
+      formData.append('file', {
+        uri,
+        name: 'audio.wav',
+        type: 'audio/wav',
+      } as any);
+
+      formData.append('email', 'bob123@gmail.com');
+      formData.append('password', 'bob');
+
+      const response = await fetch(`http://${SERVER_ADDRESS}/uploadProcessedAudio`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      const result = await response.json();
+      console.log(result);
+    } catch (error) {
+      console.error('Error compressing or sending audio:', error);
     }
   }
   

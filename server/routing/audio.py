@@ -23,6 +23,7 @@ def start():
 # returns mongodb id
 @audio.route('/uploadProcessedAudio', methods=['POST'])
 def upload_processed_audio():
+    print("/uploadProcessedAudio called")
     audio_collection = user_db.audio
     
     if 'file' not in request.files:
@@ -196,29 +197,6 @@ def process_audio():
             os.unlink(temp_file_path)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-
-        # Process the audio file to get the transcript, analysis, and emotions
-    #     transcript = get_transcript(file)
-    #     analysis = analyze_text(transcript)
-    #     emotion_results = get_audio_emotions(file)
-
-    #     # Update the database entry with the new data
-    #     audio_collection.update_one(
-    #         {"_id": ObjectId(audio_id)},
-    #         {"$set": {
-    #             "transcript": transcript,
-    #             "analysis": analysis,
-    #             "emotions": emotion_results
-    #         }}
-    #     )
-
-    #     return jsonify({"message": "Audio data processed and updated successfully"}), 200
-    # except Exception as e:
-    #     return jsonify({'error': str(e)}), 500
-    # finally:
-    #     file.close()
-    #     os.unlink(file.name)
 
 # get all audios of user
 # pass in user email
