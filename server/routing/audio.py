@@ -43,22 +43,22 @@ def upload_processed_audio():
     if file:
         try:
             # get transcript
-            # transcript = get_transcript(file)
-            transcript = "I'm sooo excited to go to the movies with you yay!!!"
+            transcript = get_transcript(file)
+            # transcript = "I'm sooo excited to go to the movies with you yay!!!"
             
             # get analysis of transcript
-            # analysis = analyze_text(transcript)
-            analysis = {
-                "Danger likeliness": "Very unlikely",
-                "Danger level": "Very low",
-                "Key words": "N/A",
-                "Person type": "N/A",
-                "Abuse type": "N/A"
-            }
+            analysis = analyze_text(transcript)
+            # analysis = {
+            #     "Danger likeliness": "Very unlikely",
+            #     "Danger level": "Very low",
+            #     "Key words": "N/A",
+            #     "Person type": "N/A",
+            #     "Abuse type": "N/A"
+            # }
 
             # detect emotions (array)
-            # emotion_results = get_audio_emotions(file)
-            emotion_results = ["Disappointment", "Awkwardness"]
+            emotion_results = get_audio_emotions_file(file)
+            # emotion_results = ["Disappointment", "Awkwardness"]
 
             # save audio to s3
             s3_url = upload_to_s3(file, os.getenv('AWS_S3_BUCKET_NAME'))
@@ -124,6 +124,7 @@ def upload_audio():
             return jsonify({'error': str(e)}), 500
 
 # process audio file in mongodb server
+# pass in email, password, audio_id
 # returns nothing
 @audio.route('/processAudio', methods=['POST'])
 def process_audio():
@@ -154,38 +155,75 @@ def process_audio():
         if not s3_url:
             return jsonify({"error": "S3 URL not found in the database entry"}), 404
 
+        response = requests.get(s3_url)
+        if response.status_code != 200:
+            return jsonify({"error": "Failed to download audio file from S3"}), 500
+        
         # Download the file from S3
-        object_name = s3_url.split('/')[-1]
-        file = tempfile.NamedTemporaryFile(delete=False)
-        s3.download_fileobj(BUCKET_NAME, object_name, file)
-        file.seek(0)
+        # object_name = s3_url.split('/')[-1]
+        # file = tempfile.NamedTemporaryFile(delete=False)
+        # s3.download_fileobj(BUCKET_NAME, object_name, file)
+        # file.seek(0)
 
-        # Process the audio file to get the transcript, analysis, and emotions
-        transcript = get_transcript(file)
-        analysis = analyze_text(transcript)
-        emotion_results = get_audio_emotions(file)
+        # Save the downloaded file to a temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_file:
+            temp_file.write(response.content)
+            temp_file_path = temp_file.name
 
-        # Update the database entry with the new data
-        audio_collection.update_one(
-            {"_id": ObjectId(audio_id)},
-            {"$set": {
-                "transcript": transcript,
-                "analysis": analysis,
-                "emotions": emotion_results
-            }}
-        )
+        try:
+            with open(temp_file_path, 'rb') as file:
+                file.seek(0)
 
-        return jsonify({"message": "Audio data processed and updated successfully"}), 200
+                # Process the audio file to get the transcript, analysis, and emotions
+                transcript = get_transcript(file)
+                analysis = analyze_text(transcript)
+                emotion_results = get_audio_emotions_url(file)
+
+                # Update the database entry with the new data
+                audio_collection.update_one(
+                    {"_id": ObjectId(audio_id)},
+                    {"$set": {
+                        "transcript": transcript,
+                        "analysis": analysis,
+                        "emotions": emotion_results
+                    }}
+                )
+
+                return jsonify({"message": "Audio data processed and updated successfully"}), 200
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+        finally:
+            os.unlink(temp_file_path)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    finally:
-        file.close()
-        os.unlink(file.name)
+
+
+        # Process the audio file to get the transcript, analysis, and emotions
+    #     transcript = get_transcript(file)
+    #     analysis = analyze_text(transcript)
+    #     emotion_results = get_audio_emotions(file)
+
+    #     # Update the database entry with the new data
+    #     audio_collection.update_one(
+    #         {"_id": ObjectId(audio_id)},
+    #         {"$set": {
+    #             "transcript": transcript,
+    #             "analysis": analysis,
+    #             "emotions": emotion_results
+    #         }}
+    #     )
+
+    #     return jsonify({"message": "Audio data processed and updated successfully"}), 200
+    # except Exception as e:
+    #     return jsonify({'error': str(e)}), 500
+    # finally:
+    #     file.close()
+    #     os.unlink(file.name)
 
 # get all audios of user
 # pass in user email
 @audio.route('/audio/user/<user_email>', methods=['GET'])
-def get_audio(user_email):
+def get_user_audio(user_email):
     audio_collection = user_db.audio
     try:
         # Find all audio data entries with the given email
@@ -265,18 +303,19 @@ def get_transcript(file):
     dg_client = DeepgramClient(os.getenv('DG_API_KEY'))
     response = dg_client.listen.rest.v("1").transcribe_file(payload, options)
 
-    print(response.to_json(indent=4))
+    # print(response.to_json(indent=4))
     transcript = response['results']['channels'][0]['alternatives'][0]['transcript']
     print("transcript: " + str(transcript))
     return transcript
 
 def analyze_text(transcript):
+    print("in analyze_text function")
     client = OpenAI(api_key=os.getenv('OPENAI_KEY'))
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", 
-             "content": "You will be given conversation transcripts. Analyze it to determine if there are signs that someone in the conversation is a victim or perpetrator of domestic abuse, sexual harassment, or general harassment. Format the response strictly as followed (if there is no words, use 'None'): [Word indicating likeliness of danger here, options: Very likely, Likely, Neutral, Unlikely, Very unlikely], [Word indicating level of danger here, options: Very high, High, Neutral, Low, Very low], [list specific language or behavior that suggests abuse, harassment, or danger directly from transcript separated by comments], [Victim or perpetrator here], [Type of abuse or harassment here]"},
+             "content": "You will be given conversation transcripts. Analyze it to determine if there are signs that someone in the conversation is a victim or perpetrator of domestic abuse, sexual harassment, or general harassment. Format the response strictly as followed: \"[Word indicating likeliness of danger here, options: Very likely, Likely, Neutral, Unlikely, Very unlikely], [Word indicating level of danger here, options: Very high, High, Neutral, Low, Very low], [list specific language or behavior that suggests abuse, harassment, or danger directly from transcript separated by comments, only include words from the transcript], [Victim or perpetrator here], [Type of abuse or harassment here]\""},
             {
                 "role": "user",
                 "content": transcript
@@ -284,22 +323,24 @@ def analyze_text(transcript):
         ]
     )
     full_analysis = response.choices[0].message.content
-    print("analysis: " + str(analysis))
     analysis_lst = full_analysis.split(',')
-    analysis = {
+    analysis_lst = [entry.replace('[', '').replace(']', '').strip() for entry in analysis_lst]
+    print(analysis_lst)
+    analysis_dict = {
         "Danger likeliness": analysis_lst[0].strip() if len(analysis_lst) > 0 and analysis_lst[0].strip() else "N/A",
         "Danger level": analysis_lst[1].strip() if len(analysis_lst) > 1 and analysis_lst[1].strip() else "N/A",
         "Key words": analysis_lst[2].strip() if len(analysis_lst) > 2 and analysis_lst[2].strip() else "N/A",
         "Person type": analysis_lst[3].strip() if len(analysis_lst) > 3 and analysis_lst[3].strip() else "N/A",
         "Abuse type": analysis_lst[4].strip() if len(analysis_lst) > 4 and analysis_lst[4].strip() else "N/A"
     }
-    return analysis
+    return analysis_dict
 
-def get_audio_emotions(file):
+def get_audio_emotions_file(file):
     client = HumeBatchClient(os.getenv('HUMEAI_KEY'))
 
-     # Create a temporary file to store the uploaded audio
+    # Create a temporary file to store the uploaded audio
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_file:
+        # Handle actual file object
         file.save(temp_file.name)
         temp_file_path = temp_file.name
 
@@ -308,24 +349,83 @@ def get_audio_emotions(file):
         config = ProsodyConfig()
         job = client.submit_job(None, [config], files=[temp_file_path])
         
-        print(job)
         print("Running...")
         
         results = job.await_complete()
         predictions = job.get_predictions()
         print(predictions)
 
-        emotion_scores = predictions[0]['results']['predictions'][0]['models']['prosody']['grouped_predictions'][0]['predictions'][0]['emotions']
-        # sort based on confidence
+        # Check if predictions contain emotions
+        if (predictions and 
+            'results' in predictions[0] and 
+            'predictions' in predictions[0]['results'] and 
+            predictions[0]['results']['predictions'] and 
+            'models' in predictions[0]['results']['predictions'][0] and 
+            'prosody' in predictions[0]['results']['predictions'][0]['models'] and 
+            'grouped_predictions' in predictions[0]['results']['predictions'][0]['models']['prosody'] and 
+            predictions[0]['results']['predictions'][0]['models']['prosody']['grouped_predictions'] and 
+            'predictions' in predictions[0]['results']['predictions'][0]['models']['prosody']['grouped_predictions'][0] and 
+            predictions[0]['results']['predictions'][0]['models']['prosody']['grouped_predictions'][0]['predictions'] and 
+            'emotions' in predictions[0]['results']['predictions'][0]['models']['prosody']['grouped_predictions'][0]['predictions'][0]):
+            emotion_scores = predictions[0]['results']['predictions'][0]['models']['prosody']['grouped_predictions'][0]['predictions'][0]['emotions']
+        else:
+            emotion_scores = []
+
+        # Sort based on confidence
+        sorted_emotions = sorted(emotion_scores, key=lambda x: x['score'], reverse=True)
+        top_emotions = sorted_emotions[:3]
+
+        top_emotion_names = [emotion["name"] for emotion in top_emotions if emotion["score"] > 0.3]
+        
+        print(top_emotion_names)
+        return top_emotion_names
+    except Exception as e:
+        print(f"Error processing audio emotions: {e}")
+        return []
+    finally:
+        # Clean up the temporary file
+        os.unlink(temp_file_path)
+
+def get_audio_emotions_url(url):
+    client = HumeBatchClient(os.getenv('HUMEAI_KEY'))
+
+    try:
+        # Configure and run the emotion detection using the URL
+        config = ProsodyConfig()
+        job = client.submit_job([url], [config])
+        
+        print("Running...")
+        
+        results = job.await_complete()
+        predictions = job.get_predictions()
+        print(predictions)
+
+        # Check if predictions contain emotions
+        if (predictions and 
+            'results' in predictions[0] and 
+            'predictions' in predictions[0]['results'] and 
+            predictions[0]['results']['predictions'] and 
+            'models' in predictions[0]['results']['predictions'][0] and 
+            'prosody' in predictions[0]['results']['predictions'][0]['models'] and 
+            'grouped_predictions' in predictions[0]['results']['predictions'][0]['models']['prosody'] and 
+            predictions[0]['results']['predictions'][0]['models']['prosody']['grouped_predictions'] and 
+            'predictions' in predictions[0]['results']['predictions'][0]['models']['prosody']['grouped_predictions'][0] and 
+            predictions[0]['results']['predictions'][0]['models']['prosody']['grouped_predictions'][0]['predictions'] and 
+            'emotions' in predictions[0]['results']['predictions'][0]['models']['prosody']['grouped_predictions'][0]['predictions'][0]):
+            emotion_scores = predictions[0]['results']['predictions'][0]['models']['prosody']['grouped_predictions'][0]['predictions'][0]['emotions']
+        else:
+            emotion_scores = []
+
+        # Sort based on confidence
         sorted_emotions = sorted(emotion_scores, key=lambda x: x['score'], reverse=True)
         top_emotions = sorted_emotions[:3]
 
         top_emotion_names = [emotion["name"] for emotion in top_emotions if emotion["score"] > 0.3]
         
         return top_emotion_names
-    finally:
-        # Clean up the temporary file
-        os.unlink(temp_file_path)
+    except Exception as e:
+        print(f"Error processing audio emotions: {e}")
+        return []
 
 def upload_to_s3(file, object_name=None):
     if object_name is None:
