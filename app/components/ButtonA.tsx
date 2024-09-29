@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
-import {Text} from "tamagui";
+import { Text } from "tamagui";
 import { Colors } from '@/constants/Colors'; // Assuming you still want to use your color constants
 
 type ButtonType = "outline" | "fill" | "text";
@@ -39,18 +39,29 @@ interface ButtonAProps {
     buttonType: ButtonType;
     children: React.ReactNode;
     textColor?: string;
+    width?: number; // Optional width prop
+    backgroundColor?: string; // Added backgroundColor prop
+    onPress?: () => void; 
 }
 
-const ButtonA: React.FC<ButtonAProps> = ({ buttonType, children, textColor, ...props }) => {
+const ButtonA: React.FC<ButtonAProps> = ({ 
+    buttonType, 
+    children, 
+    textColor, 
+    width = 350, // Default width
+    backgroundColor: customBackgroundColor, // Custom background color prop
+    onPress, 
+    ...props 
+}) => {
     const [isHovered, setIsHovered] = useState(false);
 
-    const backgroundColor = isHovered 
+    const backgroundColor = customBackgroundColor || (isHovered 
         ? hoverBackgroundColorMapping[buttonType] 
-        : backgroundColorMapping[buttonType];
+        : backgroundColorMapping[buttonType]);
 
     const defaultTextColor = isHovered 
-    ? hoverTextColorMapping[buttonType] 
-    : textColorMapping[buttonType];
+        ? hoverTextColorMapping[buttonType] 
+        : textColorMapping[buttonType];
 
     const borderWidth = borderMapping[buttonType];
 
@@ -62,13 +73,15 @@ const ButtonA: React.FC<ButtonAProps> = ({ buttonType, children, textColor, ...p
                     backgroundColor,
                     borderWidth,
                     borderColor: buttonType === 'outline' ? Colors.light.red : 'transparent', 
+                    width
                 },
             ]}
             onPressIn={() => setIsHovered(true)}
             onPressOut={() => setIsHovered(false)}
+            onPress={onPress}
             {...props}
         >
-            <Text  color= {textColor || defaultTextColor} fontWeight={'$bold'}>{children}</Text>
+            <Text color={textColor || defaultTextColor} fontWeight={'$bold'}>{children}</Text>
         </TouchableOpacity>
     );
 };
@@ -80,7 +93,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         alignItems: 'center', // Center text
         justifyContent: 'center', // Center text
-        width: 350
     },
 });
 
