@@ -153,3 +153,48 @@ model.fit(
     batch_size=BATCH_SIZE,
     epochs=1,
 )
+
+feats = wav2vec2_model.predict([tx[0],tx[1]],batch_size=2)
+import sklearn
+from sklearnex import patch_sklearn, unpatch_sklearn
+patch_sklearn()
+import xgboost as xgb
+
+xgb_params = {
+    'objective':                    'binary:logistic',
+    'predictor':                    'cpu_predictor',
+    'disable_default_eval_metric':  'true',
+}
+
+# Train the model
+warnings.simplefilter(action='ignore', category=UserWarning)
+t1_start = perf_counter()  # Time fit function
+model_xgb= xgb.XGBClassifier(**xgb_params)
+model_xgb.fit(feats,y)
+t1_stop = perf_counter()
+print ("It took", t1_stop-t1_start," to fit.")
+
+t1_start = perf_counter()  # Time fit function
+model_xgb.predict(feats)
+t1_stop = perf_counter()
+print ("It took", t1_stop-t1_start," to fit.")
+
+unpatch_sklearn()
+xgb_params = {
+    'objective':                    'binary:logistic',
+    'predictor':                    'cpu_predictor',
+    'disable_default_eval_metric':  'true',
+}
+
+# Train the model
+warnings.simplefilter(action='ignore', category=UserWarning)
+t1_start = perf_counter()  # Time fit function
+model_xgb= xgb.XGBClassifier(**xgb_params)
+model_xgb.fit(feats,y)
+t1_stop = perf_counter()
+print ("It took", t1_stop-t1_start," to fit.")
+
+t1_start = perf_counter()  # Time fit function
+model_xgb.predict(feats)
+t1_stop = perf_counter()
+print ("It took", t1_stop-t1_start," to fit.")
