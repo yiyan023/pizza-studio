@@ -78,8 +78,8 @@ export default function SoundLevelMeter() {
   
   return (
     <View>
-      {isRecording && !finished && <Text>Calculating sound level...</Text>}
-      <Button title={isRecording && !finished ? 'Recording' : 'Start'} onPress={startRecording} disabled={isRecording}/>
+      {isRecording && !finished && <Text>Calculating sound level. Please talk into your mic.</Text>}
+      <Button title={isRecording && !finished ? 'Recording' : 'Start'} onPress={startRecording} disabled={isRecording || finished}/>
       {finished && <Text>Your average decibels are: {(soundLevel.reduce((acc, val) => acc + val, 0) / soundLevel.length).toFixed(2)}</Text>}
     </View>
   );
