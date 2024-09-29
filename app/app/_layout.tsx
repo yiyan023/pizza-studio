@@ -19,7 +19,10 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    OpenSans: require('../assets/fonts/OpenSans-Regular.ttf'),
+    "OpenSans-Regular": require('../assets/fonts/OpenSans-Regular.ttf'),
+    "OpenSans-Italic": require('../assets/fonts/OpenSans-Italic.ttf'),
+    "OpenSans-Bold": require('../assets/fonts/OpenSans-Bold.ttf'),
+    "OpenSans-BoldItalic": require('../assets/fonts/OpenSans-BoldItalic.ttf'),
   });
 
   useEffect(() => {

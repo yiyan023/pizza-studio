@@ -1,7 +1,5 @@
 import { themes, tokens } from "@tamagui/themes";
 import { createFont, createTamagui } from "tamagui";
-import {Colors} from "../app/constants/Colors"
-
 const OpenSansFont = createFont({
   family: "OpenSans-Regular",
   size: {
@@ -35,8 +33,6 @@ const OpenSansFont = createFont({
     normal: { normal: "OpenSans-Regular", italic: "OpenSans-Italic" },
     bold: { normal: "OpenSans-Bold", italic: "OpenSans-BoldItalic" },
   },
-
-  color: Colors.light,
 });
 export const config = createTamagui({
   themes,

@@ -1,10 +1,15 @@
-import { View, StyleSheet, Text, TextInput, Button, Alert } from 'react-native';
+import { View, StyleSheet, TextInput, Button, Alert, Pressable, Image } from 'react-native';
+import {Text, Input, TextArea, XStack, YStack} from 'tamagui';
 import { useState } from 'react';
 import { router } from 'expo-router';
 import validator from 'validator';
+import { Colors } from '@/constants/Colors';
+import { useNavigation } from '@react-navigation/native'; // Import hook for navigation
+import Header from '../../components/Header';
+import { useColorScheme } from '@/hooks/useColorScheme';
 import { l } from 'vite/dist/node/types.d-aGj9QkWt';
 
-export default function SignIn() {
+export default function SignUp() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -81,46 +86,108 @@ export default function SignIn() {
   
 
   return (
-      <View>
-        <Text>Sign Up Form</Text>
-        <Text>Name:</Text>
-        <TextInput 
+      <YStack gap={0}>
+        <Header/>
+        <Image 
+          source={require('../../assets/images/signin-pizza.png')}
+          style={{ width: 390, height: 200, borderRadius: 0 }} // Add styling here
+        />
+        <YStack gap={20} padding={20}>
+        <Text
+        fontSize={"$heading1"} 
+        color={Colors.light.black} 
+        fontWeight={"$bold"}>
+          Create an account</Text>
+        <YStack gap={10}>
+        <Text
+        fontSize={"$normal"} 
+        color={Colors.light.black}>
+          Name</Text>
+        <Input 
           value={name}
           onChangeText={setName}
-          placeholder='name'
+          placeholder='Enter name'
+          size="$4"
+          borderWidth={1}
+          borderRadius={50}
+          backgroundColor={Colors.light.white}
+          borderColor={Colors.light.grey2}
         />
         {noName && 
-          <Text>
+          <Text
+          fontSize={"$normal"} 
+          color={Colors.light.black}>
             Please enter your name.
           </Text>
         }
-        <Text>Email:</Text>
-        <TextInput 
+        </YStack>
+        <YStack gap={10}>
+        <Text
+        fontSize={"$normal"} 
+        color={Colors.light.black}>
+          Email</Text>
+        <Input 
           value={email}
           onChangeText={setEmail}
-          placeholder='email'
+          placeholder='Enter email'
+          size="$4"
+          borderWidth={1}
+          borderRadius={50}
+          backgroundColor={Colors.light.white}
+          borderColor={Colors.light.grey2}
         />
         {badEmail && 
-          <Text>
+          <Text
+          fontSize={"$normal"} 
+          color={Colors.light.black}>
             This email already exists. Please try another one.
           </Text>}
         {noEmail && 
-        <Text>
+        <Text
+        fontSize={"$normal"} 
+          color={Colors.light.black}>
           Email is invalid. Please try again.
         </Text>}
-        <Text>Password:</Text>
-        <TextInput 
+        </YStack>
+        <YStack gap={10}>
+        <Text
+        fontSize={"$normal"} 
+        color={Colors.light.black}>
+          Password</Text>
+        <Input 
           value={password}
           onChangeText={setPassword}
-          placeholder='password'
+          placeholder='Enter password'
           secureTextEntry={true}
+          size="$4"
+          borderWidth={1}
+          borderRadius={50}
+          backgroundColor={Colors.light.white}
+          borderColor={Colors.light.grey2}
         />
         {badPassword && 
-          <Text>
+          <Text
+          fontSize={"$normal"} 
+          color={Colors.light.black}>
             Password must be at least 8 characters long. Try again.
           </Text>
         }
-        <Button title={loading ? 'loading' : 'submit'} onPress={handleSignup}/>
-      </View>
+        </YStack>
+        <Button 
+        title={loading ? 'loading' : 'submit'} 
+        onPress={handleSignup} 
+        color={Colors.light.red}/>
+        <Text 
+          fontSize={"$normal"} 
+          color={Colors.light.black}>
+          Already have an account?{' '}
+          <Text 
+            style={{ color: Colors.light.red }} 
+            onPress={() => router.navigate('/signup')}
+            cursor='pointer'>
+              Sign in</Text>
+          </Text>
+        </YStack>
+      </YStack>
   );
 }

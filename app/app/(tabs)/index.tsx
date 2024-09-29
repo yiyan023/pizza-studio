@@ -1,7 +1,11 @@
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useEffect, useState } from 'react';
 import { useSession } from '../context';
 import { router } from 'expo-router';
+
+import {Text} from "tamagui";
+import { Colors } from '@/constants/Colors';
+import  ButtonA  from './../../components/ButtonA'
 
 export default function LoadScreen() {
   const { session } = useSession();
@@ -24,10 +28,11 @@ export default function LoadScreen() {
   return (
     <View style={styles.container}>
       {loading ? (
-        <Text>Welcome!</Text>
+        <Text color={Colors.light.grey4}>Pizza Studio</Text>
       ) : (
         <Text>Welcome!</Text>
       )}
+      <ButtonA buttonType='fill' width={40} backgroundColor={Colors.light.green}>hi</ButtonA>
     </View>
   );
 }
@@ -37,5 +42,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#FAF9F6',
   },
 });
+
