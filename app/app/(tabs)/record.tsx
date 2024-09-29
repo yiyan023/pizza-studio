@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { Audio } from 'expo-av';
+import { useSession } from '../context';
 import * as FileSystem from 'expo-file-system';
-import * as Permissions from 'expo-permissions';
 
 const SERVER_ADDRESS = "192.168.0.32:5000"
 
@@ -11,6 +11,7 @@ export default function RecordAudio() {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const mediaRef = useRef<Audio.Recording | null>(null); // Use a ref for media
   const [finished, setFinished] = useState(false);
+  const { session } = useSession();
   let intervalId: NodeJS.Timeout | null = null;
 
   async function stopRecording() {
@@ -22,7 +23,6 @@ export default function RecordAudio() {
           const sound = new Audio.Sound();
           if (uri) {
             try {
-              // Compress and send the audio file
               await compressAndSendAudio(uri);
             } catch (error) {
               console.log(error);
@@ -84,8 +84,13 @@ export default function RecordAudio() {
         type: 'audio/wav',
       } as any);
 
-      formData.append('email', 'bob123@gmail.com');
-      formData.append('password', 'bob');
+      if (session?.email) {
+        formData.append('email', session?.email);
+      }
+      
+      if (session?.password) {
+        formData.append('password', session?.password);
+      }
 
       const response = await fetch(`http://${SERVER_ADDRESS}/uploadProcessedAudio`, {
         method: 'POST',

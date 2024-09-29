@@ -48,7 +48,6 @@ export default function SignIn() {
   
         if (response.ok) {
           if (result.message == "Signin successful") {
-            console.log(result.user)
             setSession(result.user)
             router.navigate("/")
           } else {
