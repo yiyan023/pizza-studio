@@ -7,6 +7,7 @@ import { Edit3, Plus } from '@tamagui/lucide-icons'
 import Profile from "./../../assets/images/Profile"
 import Comrade from "./../../assets/images/Comrade"
 import ButtonA from '@/components/ButtonA';
+import { useSession } from '../context';
 
 export default function Screen() {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,9 +16,18 @@ export default function Screen() {
   const [nameInput, setNameInput] = useState('');
   const [phoneNumberInput, setPhoneNumberInput] = useState('');
   const [savedInfo, setSavedInfo] = useState({ name: '', phoneNumber: '' });
+  const { session } = useSession();
+  
+  let email;
+  let name;
+  
+  if (session?.name) {
+    name = session.name;
+  }
 
-  const name = "John Doe";
-  const email = "joedohn@gmail.com";
+  if (session?.email) {
+    email = session.email;
+  }
 
   const toggleAccordion = () => setIsOpen(!isOpen);
   const toggleInputFields = () => setShowInputFields(!showInputFields);
