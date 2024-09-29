@@ -3,6 +3,8 @@ import { ThemedView } from '@/components/ThemedView';
 import { useEffect, useState, useRef } from 'react';
 import { useSession } from '../context';
 import { router } from 'expo-router';
+import { Audio } from 'expo-av';
+import * as FileSystem from 'expo-file-system';
 
 import {Text, YStack, ScrollView} from "tamagui";
 import { Colors } from '@/constants/Colors';
@@ -32,14 +34,16 @@ const activePizzaData = [
   { id: '12', source: require('../../assets/images/pizza12.png') },
 ];
 
-
+const SERVER_ADDRESS = "192.168.0.32:5000"
 export default function LoadScreen() {
   const { session } = useSession();
   const [loading, setLoading] = useState(true);
   const [isPizzaClicked, setIsPizzaClicked] = useState(false); // State to track pizza image clicks
+  const [isRecording, setIsRecording] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-    const scrollX = useRef(new Animated.Value(0)).current;
-    const slidesRef = useRef(null);
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const slidesRef = useRef(null);
+  const mediaRef = useRef<Audio.Recording | null>(null); // Use a ref for media
 
     const viewableItemsChanged = useRef(({ viewableItems }) => {
         if (viewableItems && viewableItems.length > 0 && viewableItems[0].index !== undefined) {
@@ -63,12 +67,107 @@ export default function LoadScreen() {
     return () => clearTimeout(timeout);
   }, [session]);  
 
-  useEffect(() => {
-    console.log(loading)
-  }, [loading])
-
-  const handlePizzaClick = () => {
+  const handlePizzaClickStart = async () => {
     setIsPizzaClicked(!isPizzaClicked); // Toggle between active and default pizza data
+
+    const { status } = await Audio.requestPermissionsAsync();
+    setIsRecording(true);
+    
+    if (status === 'granted') {
+      await Audio.setAudioModeAsync(
+        {
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        }
+      );
+
+      const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      mediaRef.current = recording;
+      console.log("recording");
+    } else {
+      console.error("Microphone permission not granted.");
+      setIsRecording(false);
+      return null;
+    }
+  };
+
+  const handlePizzaClickEnd = async () => {
+    setIsPizzaClicked(!isPizzaClicked); // Toggle between active and default pizza data
+    setIsRecording(false);
+
+    if (mediaRef.current) {
+      await mediaRef.current.stopAndUnloadAsync().then(async () => {
+        if (mediaRef.current) {
+          const uri = mediaRef.current.getURI();
+          const sound = new Audio.Sound();
+          console.log("recording stopped")
+          if (uri) {
+            try {
+              await compressAndSendAudio(uri);
+            } catch (error) {
+              console.log(error);
+            }
+          }
+          // try {
+          //     if (uri) {
+          //       await sound.loadAsync({uri: uri })
+          //       await sound.playAsync();
+          //     }
+          // } catch (error) {
+          //   console.log(error)
+          // }
+        }
+        if (intervalId) {
+          clearInterval(intervalId);
+        }
+      });
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+      });
+    }
+
+    setFinished(true);
+  };
+
+  const compressAndSendAudio = async (uri: string) => {
+    try {
+      // Read the file content
+      const random_name = generateRandomString(10);
+
+      const formData = new FormData();
+      formData.append('file', {
+        uri,
+        name: `${random_name}.wav`,
+        type: 'audio/wav',
+      } as any);
+
+      if (session?.email) {
+        formData.append('email', session?.email);
+      }
+      
+      if (session?.password) {
+        formData.append('password', session?.password);
+      }
+
+      const response = await fetch(`http://${SERVER_ADDRESS}/uploadProcessedAudio`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      const result = await response.json();
+      console.log(result);
+    } catch (error) {
+      console.error('Error compressing or sending audio:', error);
+    }
+  }
+
+  const generateRandomString = (length: number): string => {
+    return [...Array(length)]
+      .map(() => Math.random().toString(36)[2])
+      .join('');
   };
 
   const displayedPizzaData = isPizzaClicked ? activePizzaData : pizzaData; // Conditionally display pizza data
@@ -117,7 +216,7 @@ export default function LoadScreen() {
             <ScrollView style={{ flex: 1 }}>
               <View style={styles.pizzaContainer}>
                 {displayedPizzaData.map((pizza) => (
-                  <TouchableOpacity key={pizza.id} onPress={handlePizzaClick}>
+                  <TouchableOpacity key={pizza.id} onPress={isPizzaClicked ? handlePizzaClickEnd : handlePizzaClickStart}>
                     <Image source={pizza.source} style={styles.pizzaImage} />
                   </TouchableOpacity>
                 ))}
