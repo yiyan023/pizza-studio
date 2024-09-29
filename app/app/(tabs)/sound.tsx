@@ -1,69 +1,68 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
+import * as Permissions from 'expo-permissions';
+import { Audio } from 'expo-av';
 
 export default function SoundLevelMeter() {
   const [soundLevel, setSoundLevel] = useState<number[]>([]);
   const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+  const [mediaStream, setMediaStream] = useState<Audio.Recording | null>(null);
   const [finished, setFinished] = useState(false);
-  const context = new AudioContext();
-  const analyzer = context.createAnalyser();
 
-  const requestMicrophonePermission = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      setMediaStream(stream);
-      return stream;
-    } catch (error) {
-      console.error("Microphone permission error:", error);
-      return null;
-    }
-  };
-
-  const stopRecording = () => {
+  const stopRecording = async () => {
     if (mediaStream) {
-      mediaStream.getTracks().forEach((track: MediaStreamTrack) => {
-        track.stop();
-        console.log("Microphone track stopped");
-      });
+      await mediaStream.stopAndUnloadAsync(); 
+      console.log("Recording stopped");
       setMediaStream(null);
     }
+    
     setIsRecording(false);
     setFinished(true);
   };
 
   const startRecording = async () => {
-    const stream = await requestMicrophonePermission();
-    if (stream) {
-      setIsRecording(true);
-      const source = context.createMediaStreamSource(stream);
-      source.connect(analyzer);
-      analyzer.connect(context.destination);
-      const pcmData = new Float32Array(analyzer.fftSize);
-
-      if (context.state === 'suspended') {
-        await context.resume();
-      }
-
-      function calculateVolume() {
-        analyzer.getFloatTimeDomainData(pcmData);
-        let sum = 0;
-        for (const amplitude of pcmData) {
-          sum += amplitude * amplitude;
+    const { status } = await Audio.requestPermissionsAsync();
+    setIsRecording(true);
+    
+    if (status === 'granted') {
+      await Audio.setAudioModeAsync(
+        {
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
         }
+      );
 
-        const volume = Math.sqrt(sum / pcmData.length);
-        const decibels = 20 * Math.log10(volume + Number.EPSILON) + 100; // Avoid log(0)
-        
-        if (decibels > 0) {
-          setSoundLevel(prevSoundLevel => [...prevSoundLevel, decibels]);
-        }
+      const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      setMediaStream(recording);
+      console.log("Recording...")
 
-        requestAnimationFrame(calculateVolume);
-      }
-
-      calculateVolume();
+      recordAudioSamples(recording);
+    } else {
+      console.error("Microphone permission not granted.");
+      return null;
     }
+  }
+
+  const recordAudioSamples = async (recording: Audio.Recording) => {
+    // Set an interval to calculate decibels
+    const intervalId = setInterval(async () => {
+      const status = await recording.getStatusAsync();
+      if (status.isRecording) {
+        const db: number | undefined = status.metering;
+        if (db !== undefined && db !== null) {
+          setSoundLevel(prevSoundLevel => [...prevSoundLevel, db + 100]);
+        }
+      }
+    }, 1000); // Adjust the interval as needed
+
+    // Clear the interval when recording is stopped
+    return () => clearInterval(intervalId);
+  };
+
+  const calculateRMS = (data) => {
+    const sumOfSquares = data.reduce((acc, value) => acc + value * value, 0);
+    const mean = sumOfSquares / data.length;
+    return Math.sqrt(mean);
   };
 
   useEffect(() => {
@@ -77,10 +76,22 @@ export default function SoundLevelMeter() {
   }, [isRecording])
   
   return (
-    <View>
-      {isRecording && !finished && <Text>Calculating sound level. Please talk into your mic.</Text>}
+    <View style={styles.component}>
+      {isRecording && <Text style={styles.whiteText}>Calculating sound level. Please talk into your mic.</Text>}
       <Button title={isRecording && !finished ? 'Recording' : 'Start'} onPress={startRecording} disabled={isRecording || finished}/>
-      {finished && <Text>Your average decibels are: {(soundLevel.reduce((acc, val) => acc + val, 0) / soundLevel.length).toFixed(2)}</Text>}
+      {finished && <Text style={styles.whiteText}>Your average decibels are: {(soundLevel.reduce((acc, val) => acc + val, 0) / soundLevel.length).toFixed(2)}</Text>}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  component: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',       
+    padding: 16, 
+  },
+  whiteText: {
+    color: 'white',
+  },
+});
