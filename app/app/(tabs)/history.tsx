@@ -41,7 +41,7 @@ export default function TabTwoScreen() {
         "Person type": "None",
         "Abuse type": "None"
       },
-      emotions: ["Pride", "Pain", "Boredom"]
+      emotions: []
     }
   ]
   return (
@@ -49,9 +49,7 @@ export default function TabTwoScreen() {
       <ThemedView style={styles.titleContainer}>
         <Text color={Colors.light.black} fontSize={'$heading1'} fontWeight={'$bold'}>Order History</Text>
       </ThemedView>
-      <ScrollView
-      
-      >
+      <ScrollView>
         <YStack>
           {audioInfo.map((info) => {
             return <AccordionItem
@@ -71,7 +69,6 @@ export default function TabTwoScreen() {
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: 'row',
     gap: 8,
     backgroundColor: 'transparent',
     paddingTop: 50,

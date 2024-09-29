@@ -175,7 +175,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ date, time, audioSource, 
                 <Text><Text style={{ fontWeight:'bold'}}>Key words: </Text> {analysis['Key words']}</Text>
                 <Text><Text style={{ fontWeight:'bold'}}>Person type: </Text> {analysis['Person type']}</Text>
                 <Text><Text style={{ fontWeight:'bold'}}>Abuse type: </Text> {analysis['Abuse type']}</Text>
-                <Text>
+                {emotions.length != 0 && <Text>
                     <Text style={{ fontWeight:'bold'}}>Emotions:</Text>{" "}
                     {emotions.map((emotion, index) => {
                         return (
@@ -187,7 +187,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ date, time, audioSource, 
                         </>
                         );
                     })}
-                </Text>
+                </Text>}
             </View>
           )}
         </YStack>
