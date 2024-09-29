@@ -27,7 +27,6 @@ export default function TabLayout() {
             borderTopWidth: 1, // Removes the border at the top of the tab bar
             borderTopColor: Colors[colorScheme ?? 'light'].grey2,
             padding: 10,
-            height: 60
           },
         }}>
         <Tabs.Screen

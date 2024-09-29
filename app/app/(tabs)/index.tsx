@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 
 import {Text} from "tamagui";
 import { Colors } from '@/constants/Colors';
+import  ButtonA  from './../../components/ButtonA'
 
 export default function LoadScreen() {
   const { session } = useSession();
@@ -27,10 +28,11 @@ export default function LoadScreen() {
   return (
     <View style={styles.container}>
       {loading ? (
-        <Text fontSize={''} color={Colors.light.grey4}>Pizza Studio</Text>
+        <Text color={Colors.light.grey4}>Pizza Studio</Text>
       ) : (
         <Text>Welcome!</Text>
       )}
+      <ButtonA buttonType="outline"> hi </ButtonA>
     </View>
   );
 }
@@ -40,5 +42,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#FAF9F6',
   },
 });
+

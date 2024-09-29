@@ -1,5 +1,5 @@
 import React from 'react';
-import {  Text, YStack } from 'tamagui';
+import { Text, YStack } from 'tamagui';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import LogoFull from "../assets/images/LogoFull";
