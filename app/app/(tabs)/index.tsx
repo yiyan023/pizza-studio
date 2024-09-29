@@ -27,7 +27,7 @@ export default function LoadScreen() {
   return (
     <View style={styles.container}>
       {loading ? (
-        <Text color={Colors.light.grey4}>Pizza Studio</Text>
+        <Text fontSize={''} color={Colors.light.grey4}>Pizza Studio</Text>
       ) : (
         <Text>Welcome!</Text>
       )}
