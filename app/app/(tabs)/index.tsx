@@ -7,7 +7,7 @@ export default function LoadScreen() {
   const { session } = useSession();
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  /* useEffect(() => {
     const timeout = setTimeout(() => {
       if (!session) {
         router.navigate('/signin'); 
@@ -19,12 +19,12 @@ export default function LoadScreen() {
     }
 
     return () => clearTimeout(timeout);
-  }, [session]);
+  }, [session]); */
 
   return (
     <View style={styles.container}>
       {loading ? (
-        <Text>Pizza Studio</Text>
+        <Text>Welcome!</Text>
       ) : (
         <Text>Welcome!</Text>
       )}
