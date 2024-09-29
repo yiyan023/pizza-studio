@@ -37,7 +37,6 @@ def login():
     if find_user:
       name = find_user.get('name')
       session = {"name":name, "email": email, "password": password}
-      print(session)
       return jsonify({"message": "Signin successful", "user": session})
     
   return jsonify({"message": "Pizza Studio Authentication"})
