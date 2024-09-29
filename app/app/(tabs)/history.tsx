@@ -35,11 +35,20 @@ export default function TabTwoScreen() {
   const { session } = useSession();
   const userEmail = session?.email;
 
-  const fetchAudioData = async () => {
-    try {
-      const response = await fetch(`http://${SERVER_ADDRESS}:5000/audio/user/${userEmail}`);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+  useEffect(() => {
+    const fetchAudioData = async () => {
+      try {
+        const response = await fetch(`http://${SERVER_ADDRESS}:5000/audio/user/${userEmail}`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log(Object.keys(data))
+        setAudioInfo(data);
+      } catch (error) {
+        console.error('Error fetching audio data:', error);
+      } finally {
+        setLoading(false);
       }
       const data = await response.json();
       setAudioInfo(data);
@@ -65,6 +74,12 @@ export default function TabTwoScreen() {
     );
   }
 
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', options);
+  };
+
   return (
     <>
       <ThemedView style={styles.titleContainer}>
@@ -75,8 +90,8 @@ export default function TabTwoScreen() {
           {audioInfo.map((info: AccordionItemProps, index: number) => (
             <AccordionItem
               key={index}
-              date="September 29"
-              time="12:49"
+              date={formatDate(info.date.split(' ')[0])}
+              time={info.date.split(' ')[1]}
               s3_url={info.s3_url}
               transcript={info.transcript}
               analysis={info.analysis}
