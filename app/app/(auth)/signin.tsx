@@ -12,7 +12,7 @@ import ButtonA from '@/components/ButtonA';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native'; // Import hook for navigation
 
-const SERVER_ADDRESS="192.168.0.32"
+const SERVER_ADDRESS="10.36.247.235"
 
 export default function SignIn() {
 
@@ -49,6 +49,7 @@ export default function SignIn() {
         if (response.ok) {
           if (result.message == "Signin successful") {
             console.log(result.user)
+            setSession(result.user)
             router.navigate("/")
           } else {
             setLoginError(true);

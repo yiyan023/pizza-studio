@@ -120,12 +120,13 @@ def upload_processed_audio():
         except Exception as e:
             return jsonify({'error': str(e)}), 500
 
-# upload audio file to server
-# pass in audio file, email, password
+
+# upload image to server
+# pass in image file, email, password
 # returns mongodb id
-@audio.route('/uploadAudio', methods=['POST'])
+@audio.route('/uploadPhoto', methods=['POST'])
 def upload_audio():
-    audio_collection = user_db.audio
+    image_collection = user_db.images
     
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
@@ -136,6 +137,8 @@ def upload_audio():
     
     email = request.form.get('email')
     password = request.form.get('password')
+    today = datetime.now()
+    date_string = today.strftime('%Y-%m-%d %H:%M:%S')
 
     if not email or not password:
         return jsonify({"error": "Email and password are required"}), 400
@@ -146,19 +149,20 @@ def upload_audio():
     if file:
         try:
             # save audio to s3
+            file.seek(0)
             s3_url = upload_to_s3(file)
             if not s3_url:
                 return jsonify({"error": "Failed to upload to S3"}), 500
 
             # upload data to database
-            audio_data = {
+            image_data = {
                 "email": email,
                 "password": password,
-                "s3_url": s3_url
+                "s3_url": s3_url,
+                "date": date_string
             }
-            
-            result = audio_collection.insert_one(audio_data)
 
+            result = image_collection.insert_one(image_data)
             return jsonify({"s3_url": s3_url, "id": str(result.inserted_id)}), 200
         except Exception as e:
             return jsonify({'error': str(e)}), 500

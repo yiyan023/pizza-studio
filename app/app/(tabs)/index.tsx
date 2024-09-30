@@ -34,7 +34,7 @@ const activePizzaData = [
   { id: '12', source: require('../../assets/images/pizza12.png') },
 ];
 
-const SERVER_ADDRESS = "192.168.0.32:5000"
+const SERVER_ADDRESS = "10.36.247.235"
 export default function LoadScreen() {
   const { session } = useSession();
   const [loading, setLoading] = useState(true);
@@ -158,7 +158,7 @@ export default function LoadScreen() {
         formData.append('date', today.toISOString())
       }
 
-      const response = await fetch(`http://${SERVER_ADDRESS}/uploadProcessedAudio`, {
+      const response = await fetch(`http://${SERVER_ADDRESS}:5000/uploadProcessedAudio`, {
         method: 'POST',
         body: formData,
         headers: {

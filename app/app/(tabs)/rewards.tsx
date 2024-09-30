@@ -3,6 +3,10 @@ import React, { useState, useRef } from 'react';
 import { Text } from 'tamagui';
 import { Colors } from '@/constants/Colors';
 import ButtonA from '@/components/ButtonA';
+import * as ImagePicker from 'expo-image-picker';
+import { useSession } from '../context';
+
+const SERVER_ADDRESS = "10.36.247.235";
 
 const data = [
     { id: '1', source: require('../../assets/images/card-1.png') },
@@ -12,6 +16,7 @@ const data = [
 const { width } = Dimensions.get('window');
 
 export default function TabTwoScreen() {
+    const { session } = useSession();
     const [currentIndex, setCurrentIndex] = useState(0);
     const scrollX = useRef(new Animated.Value(0)).current;
     const slidesRef = useRef(null);
@@ -23,6 +28,69 @@ export default function TabTwoScreen() {
     }).current;
 
     const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
+
+    const pickImage = async () => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert('Permission Denied', 'Sorry, we need camera roll permissions to make this work!');
+            return;
+        }
+
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            const imageUri = result.assets[0].uri;
+            uploadImage(imageUri);
+        }
+    };
+
+    const uploadImage = async (uri) => {
+        const random_name = generateRandomString(10);
+        
+        const formData = new FormData();
+        formData.append('file', {
+            uri,
+            name: `${random_name}.HEIC`,
+            type: 'image/heic',
+        });
+        
+        if (session?.email) {
+            formData.append('email', session?.email);
+        }
+
+        if (session?.password) {
+            formData.append('password', session?.password);
+        }
+
+        const today = new Date();
+        formData.append('date', today.toISOString())
+
+        try {
+            const response = await fetch(`http://${SERVER_ADDRESS}:5000/uploadPhoto`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            console.log('Upload response:', data);
+            Alert.alert('Success', 'Image uploaded successfully!');
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            Alert.alert('Error', 'Failed to upload image');
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -44,7 +112,7 @@ export default function TabTwoScreen() {
                                         buttonType='fill' 
                                         width={250}
                                         textColor={Colors.light.peach}
-                                        onPress={() => alert("hi")}
+                                        onPress={pickImage}
                                     >
                                         UPLOAD
                                     </ButtonA>
@@ -141,3 +209,7 @@ const styles = StyleSheet.create({
         marginTop: 15,
     },
 });
+function generateRandomString(arg0: number) {
+    throw new Error('Function not implemented.');
+}
+

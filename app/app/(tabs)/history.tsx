@@ -29,7 +29,7 @@ interface AccordionItemProps {
 }
 
 export default function TabTwoScreen() {
-  const SERVER_ADDRESS = "192.168.0.32"
+  const SERVER_ADDRESS = "10.36.247.235"
   const [audioInfo, setAudioInfo] = useState([]);
   const [loading, setLoading] = useState(true);
   const { session } = useSession();

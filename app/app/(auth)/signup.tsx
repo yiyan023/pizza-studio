@@ -9,7 +9,7 @@ import Header from '../../components/Header';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { l } from 'vite/dist/node/types.d-aGj9QkWt';
 
-const SERVER_ADDRESS="192.168.0.32"
+const SERVER_ADDRESS="10.36.247.235"
 
 export default function SignUp() {
   const [name, setName] = useState('');
