@@ -4,7 +4,7 @@
 
 **Front-end**: React Native Expo, TypeScript, Tamagui
 **Back-end + APIs**: Python, Flask, MongoDB, Amazon Web Services, Hume AI, OpenAI, Deepgram AI, Twilio, and more!
-**Design**: Figma ((Link to Figma)[https://www.figma.com/design/pD5iPyeioum5JHwFBQre92/web-design?node-id=7-122&t=rOO81TlivDWUq7LY-1])
+**Design**: Figma ([Link to Figma](https://www.figma.com/design/pD5iPyeioum5JHwFBQre92/web-design?node-id=7-122&t=rOO81TlivDWUq7LY-1))
 
 ## Inspiration 💡
 In Canada, a staggering 46.2 million women aged 15 and older have reported experiencing abuse in intimate partner relationships. For many, domestic and sexual violence are harsh realities that women face every day. When these distressing situations escalate to legal confrontations, the unfortunate truth remains that a man's word is worth significantly more. Hence, we built Pizza Studio, a cleverly disguised pizza-ordering platform that looks like your neighborhood Domino's. It helps women collect crucial evidence during dire situations where no one believes her word.
