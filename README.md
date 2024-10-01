@@ -3,7 +3,9 @@
 ## Tech Stack 💻
 
 **Front-end**: React Native Expo, TypeScript, Tamagui
+
 **Back-end + APIs**: Python, Flask, MongoDB, Amazon Web Services, Hume AI, OpenAI, Deepgram AI, Twilio, and more!
+
 **Design**: Figma ([Link to Figma](https://www.figma.com/design/pD5iPyeioum5JHwFBQre92/web-design?node-id=7-122&t=rOO81TlivDWUq7LY-1))
 
 ## Inspiration 💡
