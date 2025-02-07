@@ -14,12 +14,16 @@ def home():
 def signup():
   if request.method == "POST":
     data = request.get_json()
+
+    # attempt to find the user's email
     existing_email = user.find_one({"email": data.get('email')})
 
+    # if the email exists, let the user know they already have an account
     if existing_email:
       print("Email exists")
       return jsonify({"message": "Email exists"})
 
+    # otherwise, insert data & return the message back to the user
     user.insert_one(data);
     return jsonify({"message": "Signup successful"})
   else:
