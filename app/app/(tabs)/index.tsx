@@ -68,7 +68,7 @@ export default function LoadScreen() {
   }, [session]);  
 
   const handlePizzaClickStart = async () => {
-    setIsPizzaClicked(!isPizzaClicked); // Toggle between active and default pizza data
+    setIsPizzaClicked(!isPizzaClicked);
 
     const { status } = await Audio.requestPermissionsAsync();
     setIsRecording(true);
@@ -83,7 +83,6 @@ export default function LoadScreen() {
 
       const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
       mediaRef.current = recording;
-      console.log("recording");
     } else {
       console.error("Microphone permission not granted.");
       setIsRecording(false);
