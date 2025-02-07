@@ -26,8 +26,9 @@ def signup():
     # otherwise, insert data & return the message back to the user
     user.insert_one(data);
     return jsonify({"message": "Signup successful"})
+  
   else:
-    return "Pizza Studio Signup Server"
+    return "Error signing up. Please try again later."
   
 @authentication.route('/login', methods=["POST", "GET"])
 def login():
