@@ -26,7 +26,8 @@ def signup():
     # otherwise, insert data & return the message back to the user
     user.insert_one(data);
     return jsonify({"message": "Signup successful"})
-  
+
+  # if not POST request, incorrect API call
   else:
     return "Error signing up. Please try again later."
   
