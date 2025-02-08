@@ -315,20 +315,25 @@ def get_audio(id):
 
 # HELPER FUNCTIONS
 def get_transcript(file):
-    # Read the file content + get transcription
+    # Read the file content
     buffer_data = file.read()
     payload: FileSource = {
         "buffer": buffer_data,
     }
+
+    # configure deepgram client
     options = PrerecordedOptions(
         smart_format=True, model="nova-2", summarize="v2", punctuate=True, language="en-US"
     )
+
+    # initialize client
     dg_client = DeepgramClient(os.getenv('DG_API_KEY'))
+
+    # transcribe audio file
     response = dg_client.listen.rest.v("1").transcribe_file(payload, options)
 
-    # print(response.to_json(indent=4))
+    # retrieve the result & return
     transcript = response['results']['channels'][0]['alternatives'][0]['transcript']
-    print("transcript: " + str(transcript))
     return transcript
 
 def analyze_text(transcript):
