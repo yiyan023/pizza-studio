@@ -337,23 +337,34 @@ def get_transcript(file):
     return transcript
 
 def analyze_text(transcript):
-    print("in analyze_text function")
+    # initialize openai client
     client = OpenAI(api_key=os.getenv('OPENAI_KEY'))
+
+    # generate response with custom message
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", 
-             "content": "You will be given conversation transcripts. Analyze it to determine if there are signs that someone in the conversation is a victim or perpetrator of domestic abuse, sexual harassment, or general harassment. Format the response strictly as followed: \"[Word indicating likeliness of danger here, options: Very likely, Likely, Neutral, Unlikely, Very unlikely], [Word indicating level of danger here, options: Very high, High, Neutral, Low, Very low], [list specific language or behavior that suggests abuse, harassment, or danger directly from transcript separated by comments, only include words from the transcript], [Victim or perpetrator here], [Type of abuse or harassment here]\""},
+             "content": """You will be given conversation transcripts. Analyze it to determine 
+             if there are signs that someone in the conversation is a victim or perpetrator of 
+             domestic abuse, sexual harassment, or general harassment. Format the response strictly 
+             as followed: \"[Word indicating likeliness of danger here, options: Very likely, Likely, 
+             Neutral, Unlikely, Very unlikely], [Word indicating level of danger here, options: Very 
+             high, High, Neutral, Low, Very low], [list specific language or behavior that suggests 
+             abuse, harassment, or danger directly from transcript separated by comments, 
+             only include words from the transcript], [Victim or perpetrator here], [
+             Type of abuse or harassment here]\""""},
             {
                 "role": "user",
                 "content": transcript
             }
         ]
     )
+
+    # retrieve & separate analysis into proper sections
     full_analysis = response.choices[0].message.content
     analysis_lst = full_analysis.split(',')
     analysis_lst = [entry.replace('[', '').replace(']', '').strip() for entry in analysis_lst]
-    print(analysis_lst)
     analysis_dict = {
         "Danger likeliness": analysis_lst[0].strip() if len(analysis_lst) > 0 and analysis_lst[0].strip() else "N/A",
         "Danger level": analysis_lst[1].strip() if len(analysis_lst) > 1 and analysis_lst[1].strip() else "N/A",
