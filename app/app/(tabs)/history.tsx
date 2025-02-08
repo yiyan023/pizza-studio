@@ -21,7 +21,7 @@ interface Analysis {
 interface AccordionItemProps {
   date: string;
   time: string;
-  s3_url: string; // Adjust based on your audio source
+  s3_url: string;
   transcript: string;
   analysis: Analysis;
   emotions: Array<string>;
