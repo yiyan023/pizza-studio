@@ -361,8 +361,10 @@ def analyze_text(transcript):
         ]
     )
 
-    # retrieve & separate analysis into proper sections
+    # retrieve analysis
     full_analysis = response.choices[0].message.content
+
+    # process analysis
     analysis_lst = full_analysis.split(',')
     analysis_lst = [entry.replace('[', '').replace(']', '').strip() for entry in analysis_lst]
     analysis_dict = {
