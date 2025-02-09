@@ -20,7 +20,6 @@ def signup():
 
     # if the email exists, let the user know they already have an account
     if existing_email:
-      print("Email exists")
       return jsonify({"message": "Email exists"})
 
     # otherwise, insert data & return the message back to the user
