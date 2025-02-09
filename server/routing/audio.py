@@ -323,7 +323,7 @@ def get_transcript(file):
 
     # configure deepgram client
     options = PrerecordedOptions(
-        smart_format=True, model="nova-2", summarize="v2", punctuate=True, language="en-US"
+        smart_format=True, model="nova-2", summarize="v2", punctuate=True, language="en-US", diarize=True
     )
 
     # initialize client
