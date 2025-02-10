@@ -28,7 +28,7 @@ def signup():
 
   # if not POST request, incorrect API call
   else:
-    return "Error signing up. Please try again later."
+    return jsonify({"message": "Error signing up"}) 
   
 @authentication.route('/login', methods=["POST", "GET"])
 def login():
